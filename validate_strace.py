@@ -33,7 +33,7 @@ def parse_our_output(path):
         while line:
             # our format will simply be name of the syscall
             syscall_name = line.replace(" ", "").replace("\n", "")
-            print(syscall_name)
+            #print(syscall_name)
             if (syscall_name in our_syscall_histogram):
                 our_syscall_histogram[syscall_name] += 1;
             else:
@@ -44,20 +44,21 @@ def parse_our_output(path):
 def main():
     global strace_syscall_histogram
     global our_syscall_histogram
-    parse_our_output("./our.txt")
-    parse_strace_file("./strace.txt")
+    parse_our_output("/home/morenbach/log.txt")
+    parse_strace_file("/home/morenbach/temp.txt.480")
 
+    total_syscalls = 0
     missed_syscalls = 0
     for k in strace_syscall_histogram:
+        total_syscalls += strace_syscall_histogram[k]
         if (k not in our_syscall_histogram):
             missed_syscalls += strace_syscall_histogram[k]
             continue
 
-        assert (strace_syscall_histogram[k] >= our_syscall_histogram[k])
-        missed_syscalls += strace_syscall_histogram[k] - our_syscall_histogram[k]
+        missed_syscalls += abs(strace_syscall_histogram[k] - our_syscall_histogram[k])
 
 
-    print (" ==== Missed syscalls: " + str(missed_syscalls) + " ==== ")
+    print (" ==== Missed syscalls: " + str(missed_syscalls) + " out of total: " + str(total_syscalls) + " (" + str(int(100*float(missed_syscalls) / total_syscalls)) + "%) ==== ")
     print ("Histogram:")
     for k in strace_syscall_histogram:
         actual = 0
