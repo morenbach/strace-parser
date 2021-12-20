@@ -44,6 +44,27 @@ def parse_our_output(path):
 def main():
     global strace_syscall_histogram
     global our_syscall_histogram
+
+    with open("/home/morenbach/temp.txt.480") as strace_fp:  
+        with open("/home/morenbach/log.txt") as our_fp:  
+            strace_line = strace_fp.readline()
+            strace_line = strace_fp.readline()
+            our_line = our_fp.readline()
+            while strace_line:
+                val = get_parser().parse(strace_line)
+                j = to_json(val)
+                strace_syscall_name = j[0]['name']
+                our_syscall_name = our_line.replace(" ", "").replace("\n", "")
+                if (strace_syscall_name != our_syscall_name):
+                    print("ERROR:" + strace_syscall_name + " vs " + our_syscall_name)
+                    return
+                else:
+                    print("OK:" + strace_syscall_name)
+                our_line = our_fp.readline()
+                strace_line = strace_fp.readline()
+    return
+
+
     parse_our_output("/home/morenbach/log.txt")
     parse_strace_file("/home/morenbach/temp.txt.480")
 
